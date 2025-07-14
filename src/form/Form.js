@@ -10,11 +10,21 @@ class Form extends React.Component {
 			immagine: "",
 			descrizione: "",
 			errors: {},
+			btn_disabled: true
 		};
 	}
 
 	handleChange = (e) => {
-		this.setState({ [e.target.name]: e.target.value });
+		this.setState({ [e.target.name]: e.target.value }, () => {
+		const { titolo, autore, annoPubblicazione } = this.state;
+
+		const isValid =
+			titolo &&
+			autore &&
+			annoPubblicazione;
+
+		this.setState({ btn_disabled: !isValid });
+		});
 	};
 
 	inputValidation = () => {
@@ -43,13 +53,13 @@ class Form extends React.Component {
 
 		// input immagine
 		if(immagine && !immagine.match(/^https?:\/\/.*\.(jpg|jpeg|png|gif|bmp|webp|svg)$/)){
-			errors.immagine = "formati accettati: jpg; jpeg; png; gif; bmp; webp; svg"
+			errors.immagine = "url non valido. formati accetati: jpg,jpeg,png,gif,bmp,webp,svg"
 		}
 
 		// l' input descrizione  è opzionale
 
 
-		// aggiungo gli errori se sono presenti
+		// aggiungo le chiavi errore allo state
 		this.setState({ errors });
 
 		// se ci sono errori ritorno false
@@ -102,6 +112,8 @@ class Form extends React.Component {
 			descrizione: "",
 			errors: {},
 		});
+
+		this.state.btn_disabled = true;
 	};
 
 	render() {
@@ -175,7 +187,7 @@ class Form extends React.Component {
 						</label>
 						<input
 							type="text"
-							className={`form-control ${this.state.errors.immagine ? 'invalid-feedback' : ''}`}
+							className={`form-control ${this.state.errors.immagine ? 'is-invalid' : ''}`}
 							id="immagine"
 							name="immagine"
 							value={this.state.immagine}
@@ -202,7 +214,7 @@ class Form extends React.Component {
 						/>
 					</div>
 
-					<button type="submit" className="btn btn-success mx-2">
+					<button type="submit" className="btn btn-success mx-2" disabled={this.state.btn_disabled}>
 						Aggiungi
 					</button>
 					<button type="reset" className="btn btn-danger" onClick={this.reset}>
