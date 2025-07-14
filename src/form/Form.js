@@ -17,28 +17,53 @@ class Form extends React.Component {
 		this.setState({ [e.target.name]: e.target.value });
 	};
 
-	submit = (e) => {
-		e.preventDefault();
-		const { titolo, autore, annoPubblicazione, immagine, descrizione } =
-			this.state;
-
+	inputValidation = () => {
 		const errors = {};
-
-		// validazione
-
+		const { titolo, autore, annoPubblicazione, immagine, descrizione } =
+		this.state;
+		
+		// input titolo
 		if (!titolo) {
 			errors.titolo = "Questo campo è obbligatorio.";
 		}
+
+		// input autore
 		if (!autore) {
 			errors.autore = "Questo campo è obbligatorio.";
+		} else if (!autore.match(/^[A-Za-zÀ-ú']{2,30}(?: [A-Za-zÀ-ú']{2,30})?$/)) {
+			errors.autore = "Formato non valido. Inserire solo lettere (es. Mario Rossi)";
 		}
+
+		// input annoPubblicazione
 		if (!annoPubblicazione) {
 			errors.annoPubblicazione = "Questo campo è obbligatorio.";
+		} else if (!/^\d{4}$/.test(annoPubblicazione)) {
+			errors.annoPubblicazione = "Inserisci un anno valido di 4 cifre (es. 2022)";
 		}
 
+		// input immagine
+		if(immagine && !immagine.match(/^https?:\/\/.*\.(jpg|jpeg|png|gif|bmp|webp|svg)$/)){
+			errors.immagine = "formati accettati: jpg; jpeg; png; gif; bmp; webp; svg"
+		}
+
+		// l' input descrizione  è opzionale
+
+
+		// aggiungo gli errori se sono presenti
 		this.setState({ errors });
 
-		if (!errors.titolo && !errors.autore && !errors.annoPubblicazione) {
+		// se ci sono errori ritorno false
+		return Object.keys(errors).length > 0 ? false : true
+	}
+
+	submit = (e) => {
+		e.preventDefault();
+
+		// controllo se fare il submit
+		if (this.inputValidation()) {
+
+			// creo l' ogetto libro valorizato con i valori presi dagli input
+			// le chiavi 'immagine' e 'descrizione' presentano delle fallback nel caso siano vuoti
 			const libro = {
 				titolo: this.state.titolo,
 				autore: this.state.autore,
@@ -50,15 +75,22 @@ class Form extends React.Component {
 					? this.state.descrizione
 					: "nessuna descrizione!",
 			};
-			this.props.aggiungiLibro(libro);
-			alert("libro aggiunto con sucesso");
-		} else {
-			alert("errore, impossibile aggiungere il libro");
 
+			// aggiungo il libro all' elenco
+			this.props.aggiungiLibro(libro);
+
+			// avviso l' utente della aggiunta del libro
+			alert("libro aggiunto con sucesso");
+
+			// reseto il form
+			this.reset();
+
+		} else {
+			// avviso l' utente dell' operazione non riuscita
+			alert("errore, impossibile aggiungere il libro");
 			return;
 		}
 
-		this.reset();
 	};
 
 	reset = () => {
@@ -103,7 +135,7 @@ class Form extends React.Component {
 						</label>
 						<input
 							type="text"
-							className={`form-control from-control-sm ${
+							className={`form-control ${
 								this.state.errors.autore ? "is-invalid" : ""
 							}`}
 							id="autore"
@@ -122,7 +154,7 @@ class Form extends React.Component {
 						</label>
 						<input
 							type="text"
-							className={`form-control from-control-sm ${
+							className={`form-control ${
 								this.state.errors.annoPubblicazione ? "is-invalid" : ""
 							}`}
 							id="annoPubblicazione"
@@ -143,12 +175,17 @@ class Form extends React.Component {
 						</label>
 						<input
 							type="text"
-							className="form-control from-control-sm"
+							className={`form-control ${this.state.errors.immagine ? 'invalid-feedback' : ''}`}
 							id="immagine"
 							name="immagine"
 							value={this.state.immagine}
 							onChange={this.handleChange}
 						/>
+							{this.state.errors.immagine && (
+							<div className="invalid-feedback">
+								{this.state.errors.immagine}
+							</div>
+						)}
 					</div>
 
 					<div className="mb-3">
@@ -156,7 +193,7 @@ class Form extends React.Component {
 							Descrizione
 						</label>
 						<textarea
-							className="form-control from-control-sm"
+							className="form-control"
 							id="descrizione"
 							name="descrizione"
 							rows="3"
@@ -166,7 +203,7 @@ class Form extends React.Component {
 					</div>
 
 					<button type="submit" className="btn btn-success mx-2">
-						Aggiungi Libro
+						Aggiungi
 					</button>
 					<button type="reset" className="btn btn-danger" onClick={this.reset}>
 						Reset
