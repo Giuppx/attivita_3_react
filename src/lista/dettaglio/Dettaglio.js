@@ -3,11 +3,14 @@ function Dettaglio(props) {
 		<>
 			<div className="mx-5">
 				<img
+				    class="mb-2"
 					src={props.libro.immagine}
 					alt={props.libro.titolo}
 					style={{ width: "300px", marginRight: "10px", height: "380px" }}
 				/>
-				<h3>Titolo: {props.libro.titolo}</h3>
+				<h2>{props.libro.titolo}</h2>
+				<p>di {props.libro.autore}</p>
+				<hr />
 				<p> {props.libro.descrizione}</p>
 				<button
 					className="btn btn-danger"
