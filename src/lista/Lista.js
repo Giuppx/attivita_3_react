@@ -14,7 +14,6 @@ function Lista(props) {
 				{props.libri.length > 0 ? (
 					props.libri.map((libro, index) => (
 						<a
-							href="#"
 							className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
 							key={index}
 							onDoubleClick={() => props.doppioClick(libro.id)}
