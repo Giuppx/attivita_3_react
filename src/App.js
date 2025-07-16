@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
+
 import "./App.css";
 
 import Navbar from "./navbar/Navbar";
@@ -10,34 +12,34 @@ function App() {
 	const [pagina, setPagina] = useState("home");
 	const [deattaglioLibro, setDettaglioLibro] = useState(null);
 
-	const [libri, setLibri] = useState([
-		{
-			titolo: "1984",
-			autore: "George Orwell",
-			annoPubblicazione: 1949,
-			immagine: "https://m.media-amazon.com/images/I/61HkdyBpKOL.jpg",
-			descrizione:
-				"Un romanzo distopico che esplora la sorveglianza di massa e il totalitarismo in un futuro inquietante.",
-		},
-		{
-			titolo: "Il piccolo principe",
-			autore: "Antoine de Saint-Exupéry",
-			annoPubblicazione: 1943,
-			immagine:
-				"https://m.media-amazon.com/images/I/71psYL+BsQL._UF1000,1000_QL80_.jpg",
-			descrizione:
-				"Un racconto poetico sull'amore, l'amicizia e il senso della vita, narrato da un bambino venuto da un altro pianeta.",
-		},
-		{
-			titolo: "Orgoglio e pregiudizio",
-			autore: "Jane Austen",
-			annoPubblicazione: 1813,
-			immagine:
-				"https://m.media-amazon.com/images/I/71CgbSAOOVL._UF1000,1000_QL80_.jpg",
-			descrizione:
-				"Una storia romantica e ironica sull'amore e le convenzioni sociali nella campagna inglese del XIX secolo.",
-		},
-	]);
+	// libri
+	const [libri, setLibri] = useState([]);
+
+	useEffect(() => {
+		axios
+			.get("https://6864ea425b5d8d03397ed017.mockapi.io/arpav/dipendenti/libri")
+			.then((response) => setLibri(response.data))
+			.catch((err) => console.log(err));
+	}, []);
+
+	function aggiungiLibro(libro) {
+		axios
+			.post(
+				"https://6864ea425b5d8d03397ed017.mockapi.io/arpav/dipendenti/libri/",
+				libro
+			)
+			.then((response) => {
+				{
+					/** aggiorno la vista */
+				}
+				setLibri((prevLibri) => [...prevLibri, response.data]);
+				{
+					/** avviso l' utente */
+				}
+				alert("libro aggiunto con successo");
+			})
+			.catch((err) => alert("errore  libro non aggiunto"));
+	}
 
 	useEffect(() => {
 		console.log(pagina);
@@ -51,12 +53,9 @@ function App() {
 		setPagina("from");
 	}
 
-	function aggiungiLibro(libro) {
-		setLibri((prev) => [...prev, libro]);
-	}
-
 	function selezionaLibro(libro, index) {
 		setDettaglioLibro({
+			id: libro.id,
 			index: index,
 			titolo: libro.titolo,
 			autore: libro.autore,
@@ -66,9 +65,19 @@ function App() {
 		});
 	}
 
-	function rimuoviLibro(index) {
-		setLibri((prevLibri) => prevLibri.filter((_, i) => i !== index));
-		setDettaglioLibro(null);
+	function rimuoviLibro(index, id) {
+		console.log("index: ", index, "id: ", id);
+		axios
+			.delete(
+				"https://6864ea425b5d8d03397ed017.mockapi.io/arpav/dipendenti/libri/" +
+					id
+			)
+			.then((response) => {
+				alert("libro rimosso");
+				setLibri((prevLibri) => prevLibri.filter((_, i) => i !== index));
+				setDettaglioLibro(null);
+			})
+			.catch((err) => alert("impossibile rimuovere il libro"));
 	}
 
 	return (
