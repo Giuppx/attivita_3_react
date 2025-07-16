@@ -80,6 +80,38 @@ function App() {
 			.catch((err) => alert("impossibile rimuovere il libro"));
 	}
 
+	// modale
+	const [libroDaModificare, setLibroDaModificare] = useState(null);
+	const [showModale, setShowModale] = useState(false);
+
+	const handleDoppioClick = (id) => {
+		axios
+			.get(
+				`https://6864ea425b5d8d03397ed017.mockapi.io/arpav/dipendenti/libri/${id}`
+			)
+			.then((res) => {
+				setLibroDaModificare(res.data);
+				setShowModale(true);
+			})
+			.catch(() => alert("Errore nel recupero del libro"));
+	};
+
+	const salvaModifiche = (id, libroModificato) => {
+		axios
+			.put(
+				`https://6864ea425b5d8d03397ed017.mockapi.io/arpav/dipendenti/libri/${id}`,
+				libroModificato
+			)
+			.then((res) => {
+				setLibri((prev) =>
+					prev.map((libro) => (libro.id === id ? res.data : libro))
+				);
+				setDettaglioLibro(res.data);
+				alert("Modifiche salvate");
+			})
+			.catch(() => alert("Errore durante il salvataggio"));
+	};
+
 	return (
 		<>
 			<div className="container-fluid mx-0 px-0">
@@ -95,7 +127,15 @@ function App() {
 								</button>
 							</div>
 							<hr />
-							<Lista libri={libri} seleziona={selezionaLibro} />
+							<Lista
+								libri={libri}
+								seleziona={selezionaLibro}
+								doppioClick={handleDoppioClick}
+								salvaModifiche={salvaModifiche}
+								libroDaModificare={libroDaModificare}
+								mostraModale={showModale}
+								setModale={setShowModale}
+							/>
 						</div>
 						<div className="col-md-6">
 							{deattaglioLibro === null ? (
