@@ -73,7 +73,7 @@ class Form extends React.Component {
 
 		// controllo se fare il submit
 		if (this.inputValidation()) {
-			// creo l' ogetto libro valorizato con i valori presi dagli input
+			// creo l' oggetto libro valorizato con i valori presi dagli input
 			// le chiavi 'immagine' e 'descrizione' presentano delle fallback nel caso siano vuoti
 			const libro = {
 				titolo: this.state.titolo,
@@ -85,6 +85,7 @@ class Form extends React.Component {
 				descrizione: this.state.descrizione
 					? this.state.descrizione
 					: "nessuna descrizione!",
+				preferiti: false,
 			};
 
 			// aggiungo il libro all' elenco

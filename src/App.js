@@ -62,6 +62,7 @@ function App() {
 			annoPubblicazione: libro.annoPubblicazione,
 			immagine: libro.immagine,
 			descrizione: libro.descrizione,
+			preferiti: libro.preferiti,
 		});
 	}
 
@@ -79,6 +80,40 @@ function App() {
 			})
 			.catch((err) => alert("impossibile rimuovere il libro"));
 	}
+
+	const handlePreferiti = (id) => {
+		axios
+			.put(
+				`https://6864ea425b5d8d03397ed017.mockapi.io/arpav/dipendenti/libri/${id}`,
+				{
+					id: deattaglioLibro.id,
+					titolo: deattaglioLibro.titolo,
+					autore: deattaglioLibro.autore,
+					annoPubblicazione: deattaglioLibro.annoPubblicazione,
+					immagine: deattaglioLibro.immagine,
+					descrizione: deattaglioLibro.descrizione,
+					preferiti: !deattaglioLibro.preferiti,
+				}
+			)
+			.then((res) => {
+				console.log("res: ", res.data);
+				// aggiorno array libri
+				setLibri((prevLibri) =>
+					prevLibri.map((l) => (l.id === id ? res.data : l))
+				);
+
+				// aggiorno libro selezionato
+				setDettaglioLibro((prev) =>
+					prev && prev.id === id
+						? {
+								...prev,
+								preferiti: res.data.preferiti,
+						  }
+						: prev
+				);
+			})
+			.catch((err) => alert("impossibile salvare nei preferiti"));
+	};
 
 	// modale
 	const [libroDaModificare, setLibroDaModificare] = useState(null);
@@ -144,6 +179,7 @@ function App() {
 								<Dettaglio
 									libro={deattaglioLibro}
 									eliminaLibro={rimuoviLibro}
+									handlePreferiti={handlePreferiti}
 								/>
 							)}
 						</div>
