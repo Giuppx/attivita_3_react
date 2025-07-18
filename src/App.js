@@ -50,7 +50,7 @@ function App() {
 	}, [libri]);
 
 	function navigaForm() {
-		setPagina("from");
+		setPagina("form");
 	}
 
 	function selezionaLibro(libro, index) {
